@@ -4,4 +4,9 @@ import json
 import re
 import random
 
+app = Flask(__name__)
+
+chat_history = []
+user_context = {}
+
 
