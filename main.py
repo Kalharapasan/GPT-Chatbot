@@ -6,9 +6,11 @@ import random
 
 app = Flask(__name__)
 
+# In-memory storage
 chat_history = []
-user_context = {}
+user_context = {}  # Track user conversation context
 
+# HTML Template with Advanced UI
 HTML_TEMPLATE = '''
 <!DOCTYPE html>
 <html lang="en">
@@ -697,3 +699,314 @@ HTML_TEMPLATE = '''
 </body>
 </html>
 '''
+
+class AdvancedAIBot:
+    """Enhanced AI bot with better intelligence and context awareness"""
+    
+    def __init__(self):
+        self.knowledge_base = {
+            'ai': [
+                "Artificial Intelligence is the simulation of human intelligence by machines.",
+                "AI can learn from data, recognize patterns, and make decisions.",
+                "There are different types of AI: narrow AI (specific tasks) and general AI (human-level)."
+            ],
+            'machine_learning': [
+                "Machine Learning is a subset of AI that learns from data without explicit programming.",
+                "Common ML techniques include supervised learning, unsupervised learning, and reinforcement learning."
+            ],
+            'python': [
+                "Python is a high-level, interpreted programming language known for its simplicity.",
+                "Python is widely used in data science, web development, automation, and AI.",
+                "Key features: easy syntax, extensive libraries, strong community support."
+            ],
+            'technology': [
+                "Technology evolves rapidly, changing how we live and work.",
+                "Emerging technologies include quantum computing, blockchain, and biotechnology.",
+                "Technology can solve complex problems but requires responsible use."
+            ]
+        }
+        
+        self.conversation_history = []
+    
+    def analyze_sentiment(self, text):
+        """Simple sentiment analysis"""
+        text_lower = text.lower()
+        
+        positive_words = ['good', 'great', 'excellent', 'happy', 'love', 'wonderful', 'amazing', 'thank']
+        negative_words = ['bad', 'terrible', 'hate', 'awful', 'horrible', 'sad', 'angry', 'frustrated']
+        
+        positive_count = sum(1 for word in positive_words if word in text_lower)
+        negative_count = sum(1 for word in negative_words if word in text_lower)
+        
+        if positive_count > negative_count:
+            return 'positive'
+        elif negative_count > positive_count:
+            return 'negative'
+        else:
+            return 'neutral'
+    
+    def extract_keywords(self, text):
+        """Extract important keywords from text"""
+        text_lower = text.lower()
+        keywords = []
+        
+        for topic in self.knowledge_base.keys():
+            if topic in text_lower or topic.replace('_', ' ') in text_lower:
+                keywords.append(topic)
+        
+        return keywords
+    
+    def get_context_aware_response(self, message):
+        """Generate intelligent, context-aware responses"""
+        message_lower = message.lower()
+        sentiment = self.analyze_sentiment(message)
+        keywords = self.extract_keywords(message)
+        
+        # Greeting
+        if any(word in message_lower for word in ['hello', 'hi', 'hey', 'greetings', 'good morning', 'good evening']):
+            responses = [
+                f"Hello! I'm your AI assistant. How can I help you today? 😊",
+                f"Hi there! Great to see you! What would you like to know? 🌟",
+                f"Greetings! I'm ready to assist you with any questions! 🤖"
+            ]
+            return {
+                'response': random.choice(responses),
+                'category': 'greeting',
+                'sentiment': sentiment
+            }
+        
+        # Technical questions
+        elif any(word in message_lower for word in ['code', 'program', 'algorithm', 'function', 'python', 'java', 'javascript']):
+            if keywords:
+                info = self.knowledge_base.get(keywords[0], [])
+                response = f"Great technical question! {random.choice(info) if info else ''} "
+            else:
+                response = "Interesting technical question! "
+            
+            response += f"When it comes to {message}, I'd recommend breaking it down into smaller steps. Would you like me to explain a specific aspect in more detail? 💻"
+            
+            return {
+                'response': response,
+                'category': 'technical',
+                'sentiment': sentiment
+            }
+        
+        # Creative requests
+        elif any(word in message_lower for word in ['create', 'write', 'story', 'poem', 'design', 'imagine', 'idea']):
+            responses = [
+                f"I love creative challenges! For '{message}', let me share some ideas... Creativity often starts with combining unexpected elements. What specific style or theme are you interested in? 🎨",
+                f"Fantastic! Creative projects are exciting. Based on your request about '{message}', I suggest exploring different perspectives and experimenting with various approaches. What's your vision? ✨"
+            ]
+            return {
+                'response': random.choice(responses),
+                'category': 'creative',
+                'sentiment': sentiment
+            }
+        
+        # Analysis requests
+        elif any(word in message_lower for word in ['analyze', 'compare', 'evaluate', 'difference', 'pros', 'cons']):
+            responses = [
+                f"Excellent analytical question! Let me break down '{message}' for you... When analyzing this, we should consider multiple factors: efficiency, impact, and feasibility. What specific aspect would you like me to focus on? 📊",
+                f"Great question for analysis! Regarding '{message}', I'll provide a comprehensive perspective. The key factors to consider are context, scale, and outcomes. Would you like a detailed comparison? 📈"
+            ]
+            return {
+                'response': random.choice(responses),
+                'category': 'analysis',
+                'sentiment': sentiment
+            }
+        
+        # Questions
+        elif any(word in message_lower for word in ['how', 'what', 'why', 'when', 'where', 'who', 'which', '?']):
+            if keywords:
+                topic_info = self.knowledge_base.get(keywords[0], [])
+                if topic_info:
+                    response = f"Great question about {keywords[0].replace('_', ' ')}! {random.choice(topic_info)} "
+                else:
+                    response = f"Interesting question! Regarding '{message}', "
+            else:
+                response = f"That's a thoughtful question! About '{message}', "
+            
+            response += "let me provide you with detailed information. This topic has multiple dimensions worth exploring. Would you like me to elaborate on any specific aspect? 🔍"
+            
+            return {
+                'response': response,
+                'category': 'question',
+                'sentiment': sentiment
+            }
+        
+        # Help requests
+        elif any(word in message_lower for word in ['help', 'assist', 'support', 'guide', 'explain', 'teach']):
+            responses = [
+                f"I'm here to help! 🆘 Regarding '{message}', I can provide step-by-step guidance. I specialize in answering questions, explaining concepts, analyzing data, and creative problem-solving. What would you like to focus on?",
+                f"Absolutely! I'd be happy to assist with '{message}'. My capabilities include information lookup, code assistance, creative writing, data analysis, and strategic thinking. How can I support you best? 💪"
+            ]
+            return {
+                'response': random.choice(responses),
+                'category': 'help',
+                'sentiment': sentiment
+            }
+        
+        # Gratitude
+        elif any(word in message_lower for word in ['thank', 'thanks', 'appreciate', 'grateful']):
+            responses = [
+                "You're very welcome! 😊 I'm always happy to help. Feel free to ask if you have more questions!",
+                "My pleasure! 🌟 That's what I'm here for. Don't hesitate to reach out anytime!",
+                "Glad I could help! 🤗 If you need anything else, just let me know!"
+            ]
+            return {
+                'response': random.choice(responses),
+                'category': 'gratitude',
+                'sentiment': sentiment
+            }
+        
+        # General conversation
+        else:
+            responses = [
+                f"I understand you're talking about '{message}'. That's an interesting topic! Let me share some insights... Based on current knowledge, this subject involves various considerations. What specific information are you looking for? 💡",
+                f"Thanks for sharing! Regarding '{message}', there are several interesting angles to explore. I can help you understand this better with examples, explanations, or practical applications. What would be most helpful? 🌐"
+            ]
+            return {
+                'response': random.choice(responses),
+                'category': 'general',
+                'sentiment': sentiment
+            }
+
+# Initialize the bot
+ai_bot = AdvancedAIBot()
+
+@app.route('/')
+def index():
+    return render_template_string(HTML_TEMPLATE)
+
+@app.route('/send', methods=['POST'])
+def send_message():
+    data = request.json
+    user_message = data.get('message', '')
+    
+    # Add user message
+    user_msg = {
+        'id': len(chat_history) + 1,
+        'type': 'user',
+        'text': user_message,
+        'timestamp': datetime.now().strftime('%I:%M:%S %p'),
+        'category': 'user-query',
+        'sentiment': ai_bot.analyze_sentiment(user_message)
+    }
+    chat_history.append(user_msg)
+    
+    # Get AI response with enhanced intelligence
+    ai_response = ai_bot.get_context_aware_response(user_message)
+    bot_msg = {
+        'id': len(chat_history) + 1,
+        'type': 'bot',
+        'text': ai_response['response'],
+        'timestamp': datetime.now().strftime('%I:%M:%S %p'),
+        'category': ai_response['category'],
+        'sentiment': ai_response['sentiment']
+    }
+    chat_history.append(bot_msg)
+    
+    return jsonify({'success': True})
+
+@app.route('/messages')
+def get_messages():
+    sort_by = request.args.get('sort', 'time')
+    filter_category = request.args.get('filter', 'all')
+    search_term = request.args.get('search', '').lower()
+    
+    # Filter messages
+    filtered = chat_history
+    
+    if filter_category != 'all':
+        filtered = [msg for msg in filtered if msg['category'] == filter_category]
+    
+    if search_term:
+        filtered = [msg for msg in filtered if search_term in msg['text'].lower()]
+    
+    # Sort messages
+    if sort_by == 'time':
+        sorted_messages = filtered
+    elif sort_by == 'reverse':
+        sorted_messages = list(reversed(filtered))
+    elif sort_by == 'type':
+        sorted_messages = sorted(filtered, key=lambda x: x['type'])
+    elif sort_by == 'category':
+        sorted_messages = sorted(filtered, key=lambda x: x['category'])
+    else:
+        sorted_messages = filtered
+    
+    return jsonify({
+        'messages': sorted_messages,
+        'all_messages': chat_history,
+        'total': len(chat_history),
+        'displayed': len(sorted_messages)
+    })
+
+@app.route('/export')
+def export_data():
+    from flask import Response
+    
+    export_obj = {
+        'export_date': datetime.now().isoformat(),
+        'total_messages': len(chat_history),
+        'messages': chat_history,
+        'statistics': {
+            'total': len(chat_history),
+            'user_messages': len([m for m in chat_history if m['type'] == 'user']),
+            'bot_messages': len([m for m in chat_history if m['type'] == 'bot']),
+            'categories': {}
+        }
+    }
+    
+    # Calculate category statistics
+    for msg in chat_history:
+        cat = msg.get('category', 'unknown')
+        export_obj['statistics']['categories'][cat] = export_obj['statistics']['categories'].get(cat, 0) + 1
+    
+    json_data = json.dumps(export_obj, indent=2)
+    return Response(
+        json_data,
+        mimetype='application/json',
+        headers={'Content-Disposition': 'attachment;filename=chat_data.json'}
+    )
+
+@app.route('/clear', methods=['POST'])
+def clear_chat():
+    chat_history.clear()
+    # Re-add welcome message
+    chat_history.append({
+        'id': 1,
+        'type': 'bot',
+        'text': 'Hello! I\'m your Advanced AI Assistant! 🤖 I can help you with questions, coding, creative projects, analysis, and much more. What would you like to explore today?',
+        'timestamp': datetime.now().strftime('%I:%M:%S %p'),
+        'category': 'greeting',
+        'sentiment': 'positive'
+    })
+    return jsonify({'success': True})
+
+if __name__ == '__main__':
+    # Add enhanced welcome message
+    chat_history.append({
+        'id': 1,
+        'type': 'bot',
+        'text': 'Hello! I\'m your Advanced AI Assistant! 🤖 I can help you with questions, coding, creative projects, analysis, and much more. What would you like to explore today?',
+        'timestamp': datetime.now().strftime('%I:%M:%S %p'),
+        'category': 'greeting',
+        'sentiment': 'positive'
+    })
+    
+    print("=" * 60)
+    print("🤖 Advanced AI Chat Room Server Starting...")
+    print("=" * 60)
+    print("✨ Features:")
+    print("   • Enhanced AI Intelligence with context awareness")
+    print("   • Sentiment Analysis")
+    print("   • Advanced categorization (7 categories)")
+    print("   • Beautiful animated UI")
+    print("   • Real-time statistics dashboard")
+    print("   • Quick action buttons")
+    print("   • Export & data management")
+    print("=" * 60)
+    print("📍 Open your browser and go to: http://localhost:5000")
+    print("=" * 60)
+    app.run(debug=True, host='0.0.0.0', port=5000)
