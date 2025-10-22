@@ -788,24 +788,40 @@ def index():
 
 @app.route('/send', methods=['POST'])
 def send_message():
-    data = request.json
-    user_message = data.get('message', '')
-    
+    # Validate input JSON
+    if not request.is_json:
+        return jsonify({'success': False, 'error': 'Invalid JSON'}), 400
+
+    data = request.get_json(silent=True)
+    if not data or 'message' not in data:
+        return jsonify({'success': False, 'error': 'Missing message field'}), 400
+
+    user_message = str(data.get('message', '')).strip()
+    if not user_message:
+        return jsonify({'success': False, 'error': 'Empty message'}), 400
+
+    # Append user message
     user_msg = {
         'type': 'user',
         'text': user_message,
         'timestamp': datetime.now().strftime('%I:%M:%S %p')
     }
     chat_history.append(user_msg)
-    
-    ai_response = ai_bot.get_response(user_message)
+
+    # Generate AI response (guarded)
+    try:
+        ai_response = ai_bot.get_response(user_message)
+    except Exception as e:
+        ai_response = "Sorry, I couldn't process that right now."
+        app.logger.exception('AI response generation failed')
+
     bot_msg = {
         'type': 'bot',
         'text': ai_response,
         'timestamp': datetime.now().strftime('%I:%M:%S %p')
     }
     chat_history.append(bot_msg)
-    
+
     return jsonify({
         'success': True,
         'response': ai_response
